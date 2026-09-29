@@ -8,11 +8,13 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Luna
+        uses: actions/checkout@v4
         with:
           path: luna
 
-      - uses: actions/checkout@v4
+      - name: Checkout llama.cpp
+        uses: actions/checkout@v4
         with:
           repository: ggml-org/llama.cpp
           path: llama
@@ -30,18 +32,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install NDK and CMake
-        run: sdkmanager "ndk;29.0.13113456" "cmake;3.31.6"
-
-      - name: Build
-        working-directory: llama/examples/llama.android
-        run: ./gradlew :app:assembleDebug --no-daemon
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: Luna-Local-debug-apk
-          path: llama/examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "ndk;29.
