@@ -1,1 +1,38 @@
-cGx1Z2lucyB7IGFsaWFzKGxpYnMucGx1Z2lucy5hbmRyb2lkLmFwcGxpY2F0aW9uKTsgYWxpYXMobGlicy5wbHVnaW5zLmpldGJyYWlucy5rb3RsaW4uYW5kcm9pZCkgfQphbmRyb2lkIHsgbmFtZXNwYWNlPSJhaS5sdW5hLmxvY2FsIjsgY29tcGlsZVNkaz0zNgogZGVmYXVsdENvbmZpZyB7IGFwcGxpY2F0aW9uSWQ9ImFpLmx1bmEubG9jYWwiOyBtaW5TZGs9MzM7IHRhcmdldFNkaz0zNjsgdmVyc2lvbkNvZGU9MTsgdmVyc2lvbk5hbWU9IjAuMS4wIiB9CiBjb21waWxlT3B0aW9ucyB7IHNvdXJjZUNvbXBhdGliaWxpdHk9SmF2YVZlcnNpb24uVkVSU0lPTl8xNzsgdGFyZ2V0Q29tcGF0aWJpbGl0eT1KYXZhVmVyc2lvbi5WRVJTSU9OXzE3IH0KIGtvdGxpbiB7IGp2bVRvb2xjaGFpbigxNykgfQp9CmRlcGVuZGVuY2llcyB7IGltcGxlbWVudGF0aW9uKGxpYnMuYnVuZGxlcy5hbmRyb2lkeCk7IGltcGxlbWVudGF0aW9uKGxpYnMubWF0ZXJpYWwpOyBpbXBsZW1lbnRhdGlvbihwcm9qZWN0KCI6bGliIikpOyBpbXBsZW1lbnRhdGlvbigiYW5kcm9pZHgud29yazp3b3JrLXJ1bnRpbWUta3R4OjIuMTAuMSIpOyBpbXBsZW1lbnRhdGlvbigib3JnLmpldGJyYWlucy5rb3RsaW54OmtvdGxpbngtY29yb3V0aW5lcy1hbmRyb2lkOjEuMTAuMiIpIH0K
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
+}
+
+android {
+    namespace = "ai.luna.local"
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = "ai.luna.local"
+        minSdk = 33
+        targetSdk = 36
+        versionCode = 1
+        versionName = "0.1.0"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlin {
+        jvmToolchain(17)
+    }
+}
+
+dependencies {
+    implementation(project(":lib"))
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation("androidx.work:work-runtime-ktx:2.10.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
+    debugImplementation(libs.androidx.compose.ui.tooling)
+}
