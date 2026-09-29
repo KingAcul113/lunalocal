@@ -1,1 +1,47 @@
-bmFtZTogQnVpbGQgTHVuYSBBUEsKb246IHsgd29ya2Zsb3dfZGlzcGF0Y2g6IHt9IH0Kam9iczoKICBidWlsZDoKICAgIHJ1bnMtb246IHVidW50dS0yNC4wNAogICAgc3RlcHM6CiAgICAgIC0gdXNlczogYWN0aW9ucy9jaGVja291dEB2NAogICAgICAgIHdpdGg6IHsgcGF0aDogbHVuYSB9CiAgICAgIC0gdXNlczogYWN0aW9ucy9jaGVja291dEB2NAogICAgICAgIHdpdGg6CiAgICAgICAgICByZXBvc2l0b3J5OiBnZ21sLW9yZy9sbGFtYS5jcHAKICAgICAgICAgIHBhdGg6IGxsYW1hCiAgICAgICAgICBmZXRjaC1kZXB0aDogMQogICAgICAtIG5hbWU6IE92ZXJsYXkgTHVuYSBhcHAKICAgICAgICBydW46IHwKICAgICAgICAgIHJtIC1yZiBsbGFtYS9leGFtcGxlcy9sbGFtYS5hbmRyb2lkL2FwcC9zcmMvbWFpbgogICAgICAgICAgY3AgLXIgbHVuYS9hcHAvc3JjL21haW4gbGxhbWEvZXhhbXBsZXMvbGxhbWEuYW5kcm9pZC9hcHAvc3JjL21haW4KICAgICAgICAgIGNwIGx1bmEvYXBwL2J1aWxkLmdyYWRsZS5rdHMgbGxhbWEvZXhhbXBsZXMvbGxhbWEuYW5kcm9pZC9hcHAvYnVpbGQuZ3JhZGxlLmt0cwogICAgICAtIG5hbWU6IFNldCB1cCBKYXZhCiAgICAgICAgdXNlczogYWN0aW9ucy9zZXR1cC1qYXZhQHY0CiAgICAgICAgd2l0aDogeyBkaXN0cmlidXRpb246IHRlbXVyaW4sIGphdmEtdmVyc2lvbjogJzE3JyB9CiAgICAgIC0gbmFtZTogU2V0IHVwIEFuZHJvaWQgU0RLCiAgICAgICAgdXNlczogYW5kcm9pZC1hY3Rpb25zL3NldHVwLWFuZHJvaWRAdjMKICAgICAgLSBuYW1lOiBJbnN0YWxsIE5ESyBhbmQgQ01ha2UKICAgICAgICBydW46IHNka21hbmFnZXIgIm5kazsyOS4wLjEzMTEzNDU2IiAiY21ha2U7My4zMS42IgogICAgICAtIG5hbWU6IEJ1aWxkCiAgICAgICAgd29ya2luZy1kaXJlY3Rvcnk6IGxsYW1hL2V4YW1wbGVzL2xsYW1hLmFuZHJvaWQKICAgICAgICBydW46IC4vZ3JhZGxldyA6YXBwOmFzc2VtYmxlRGVidWcgLS1uby1kYWVtb24KICAgICAgLSBuYW1lOiBVcGxvYWQgQVBLCiAgICAgICAgdXNlczogYWN0aW9ucy91cGxvYWQtYXJ0aWZhY3RAdjQKICAgICAgICB3aXRoOgogICAgICAgICAgbmFtZTogTHVuYS1Mb2NhbC1kZWJ1Zy1hcGsKICAgICAgICAgIHBhdGg6IGxsYW1hL2V4YW1wbGVzL2xsYW1hLmFuZHJvaWQvYXBwL2J1aWxkL291dHB1dHMvYXBrL2RlYnVnL2FwcC1kZWJ1Zy5hcGsK
+name: Build Luna APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: luna
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ggml-org/llama.cpp
+          path: llama
+          fetch-depth: 1
+
+      - name: Overlay Luna app
+        run: |
+          rm -rf llama/examples/llama.android/app/src/main
+          cp -r luna/app/src/main llama/examples/llama.android/app/src/main
+          cp luna/app/build.gradle.kts llama/examples/llama.android/app/build.gradle.kts
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK and CMake
+        run: sdkmanager "ndk;29.0.13113456" "cmake;3.31.6"
+
+      - name: Build
+        working-directory: llama/examples/llama.android
+        run: ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Luna-Local-debug-apk
+          path: llama/examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
