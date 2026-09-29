@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Luna
@@ -20,19 +20,27 @@ jobs:
           path: llama
           fetch-depth: 1
 
-      - name: Overlay Luna app
-        run: |
-          rm -rf llama/examples/llama.android/app/src/main
-          cp -r luna/app/src/main llama/examples/llama.android/app/src/main
-          cp luna/app/build.gradle.kts llama/examples/llama.android/app/build.gradle.kts
-
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Install NDK and CMake
+      - name: Overlay Luna app
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "ndk;29.
+          rm -rf llama/examples/llama.android/app/src/main
+          cp -r luna/app/src/main llama/examples/llama.android/app/src/main
+          cp luna/app/build.gradle.kts llama/examples/llama.android/app/build.gradle.kts
+
+      - name: Build Luna APK
+        working-directory: llama/examples/llama.android
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Upload Luna APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Luna-Local-debug-apk
+          path: llama/examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
