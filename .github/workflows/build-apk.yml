@@ -1,17 +1,25 @@
-name: Build Luna APK
+name: Build Luna APK - Clean Repair
 
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-24.04
-
     steps:
       - name: Checkout Luna
         uses: actions/checkout@v4
         with:
           path: luna
+
+      - name: Reconstruct clean Luna source
+        shell: bash
+        run: |
+          rm -rf luna/app
+          echo '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' | base64 --decode | tar -xz -C luna
 
       - name: Checkout llama.cpp
         uses: actions/checkout@v4
@@ -21,6 +29,7 @@ jobs:
           fetch-depth: 1
 
       - name: Overlay Luna app
+        shell: bash
         run: |
           rm -rf llama/examples/llama.android/app/src/main
           cp -r luna/app/src/main llama/examples/llama.android/app/src/main
@@ -34,6 +43,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
 
       - name: Install NDK and CMake
         run: |
